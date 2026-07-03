@@ -12,10 +12,12 @@ function initFormLoading() {
   form.addEventListener("submit", () => {
     const button = document.getElementById("add-btn");
     if (!button || button.disabled) return;
-    button.disabled = true;
-    button.classList.add("loading");
-    button.dataset.originalText = button.textContent;
-    button.innerHTML = '<span class="spinner"></span> Сохранение...';
+    // Не блокируем отправку формы синхронным disabled (ломает submit в headless Chrome)
+    window.setTimeout(() => {
+      button.disabled = true;
+      button.classList.add("loading");
+      button.innerHTML = '<span class="spinner"></span> Сохранение...';
+    }, 0);
   });
 }
 

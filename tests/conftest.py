@@ -98,6 +98,7 @@ def authenticated_api_client(api_client: ApiClient, registered_admin: dict[str, 
 
 @pytest.fixture
 def driver(mock_server: str) -> Generator[webdriver.Chrome, None, None]:
+  import os
   import shutil
 
   options = Options()
@@ -105,10 +106,13 @@ def driver(mock_server: str) -> Generator[webdriver.Chrome, None, None]:
     options.add_argument("--headless=new")
   options.add_argument("--no-sandbox")
   options.add_argument("--disable-dev-shm-usage")
+  options.add_argument("--disable-gpu")
   options.add_argument("--window-size=1920,1080")
 
   chrome_binary = (
-    shutil.which("google-chrome")
+    os.getenv("CHROME_BIN")
+    or os.getenv("CHROME_PATH")
+    or shutil.which("google-chrome")
     or shutil.which("google-chrome-stable")
     or shutil.which("chromium")
     or shutil.which("chromium-browser")

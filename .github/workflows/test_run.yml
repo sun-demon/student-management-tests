@@ -29,12 +29,14 @@ jobs:
 
       - name: Install Google Chrome
         uses: browser-actions/setup-chrome@v1
+        id: chrome
 
       - name: Run tests
         env:
           BASE_URL: http://127.0.0.1:5000
           HEADLESS: "true"
-          WEBDRIVER_TIMEOUT: "20"
+          WEBDRIVER_TIMEOUT: "30"
+          CHROME_BIN: ${{ steps.chrome.outputs.chrome-path }}
         run: |
           mkdir -p reports
           pytest tests/ \

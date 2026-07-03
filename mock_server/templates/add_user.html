@@ -16,14 +16,14 @@
   {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
   {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
 
-  <form method="post" id="add-student-form" class="form-grid">
+  <form method="post" id="add-student-form" class="form-grid" novalidate>
     <div class="form-group">
       <label for="full_name">ФИО *</label>
       <input name="full_name" id="full_name" placeholder="Иванов Иван Иванович" value="{{ form_data.full_name if form_data else '' }}">
     </div>
     <div class="form-group">
       <label for="age">Возраст *</label>
-      <input name="age" id="age" type="number" min="0" max="120" placeholder="20" value="{{ form_data.age if form_data else '' }}">
+      <input name="age" id="age" type="number" placeholder="20" value="{{ form_data.age if form_data else '' }}">
       <div class="hint">Только целое неотрицательное число</div>
     </div>
     <div class="form-group">

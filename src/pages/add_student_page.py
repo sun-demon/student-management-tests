@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import Any
 
 from selenium.webdriver.common.by import By
-
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import Select
 
 from src.pages.base_page import BasePage
 
@@ -19,6 +19,7 @@ class AddStudentPage(BasePage):
   ERROR_MESSAGE = (By.CSS_SELECTOR, ".alert-error")
   SUCCESS_MESSAGE = (By.CSS_SELECTOR, ".alert-success")
   STUDENTS_TABLE = (By.ID, "students-table")
+  FORM_ALERT = (By.CSS_SELECTOR, ".alert-error, .alert-success")
 
   def open_add_student(self) -> None:
     self.open("/add-user")
@@ -26,13 +27,23 @@ class AddStudentPage(BasePage):
       raise AssertionError("Нет UI-авторизации: открылась страница входа вместо /add-user")
     self.wait_for_element_visible(self.FULL_NAME_INPUT)
 
+  def clear_form(self) -> None:
+    self.driver.find_element(*self.FULL_NAME_INPUT).clear()
+    self.driver.find_element(*self.AGE_INPUT).clear()
+    self.driver.find_element(*self.ENROLLMENT_DATE_INPUT).clear()
+    Select(self.driver.find_element(*self.GENDER_SELECT)).select_by_value("")
+    checkbox = self.driver.find_element(*self.IS_ACTIVE_CHECKBOX)
+    if checkbox.is_selected():
+      checkbox.click()
+
   def fill_form(self, student: dict[str, Any]) -> None:
+    self.clear_form()
     if "full_name" in student and student["full_name"] is not None:
       self.driver.find_element(*self.FULL_NAME_INPUT).send_keys(student["full_name"])
-    if "age" in student and student["age"] is not None:
+    if "age" in student and student["age"] is not None and student["age"] != "":
       self.driver.find_element(*self.AGE_INPUT).send_keys(str(student["age"]))
     if student.get("gender"):
-      self.driver.find_element(*self.GENDER_SELECT).send_keys(student["gender"])
+      Select(self.driver.find_element(*self.GENDER_SELECT)).select_by_value(student["gender"])
     if student.get("enrollment_date"):
       self.driver.find_element(*self.ENROLLMENT_DATE_INPUT).send_keys(student["enrollment_date"])
     if student.get("is_active"):
@@ -41,9 +52,12 @@ class AddStudentPage(BasePage):
         checkbox.click()
 
   def submit(self) -> None:
+    alerts_before = len(self.driver.find_elements(*self.FORM_ALERT))
     self.wait_for_element_clickable(self.SUBMIT_BUTTON).click()
     self.wait.until(
-      EC.presence_of_element_located((By.CSS_SELECTOR, ".alert-error, .alert-success"))
+      lambda d: len(d.find_elements(*self.FORM_ALERT)) > alerts_before
+      or d.find_elements(*self.SUCCESS_MESSAGE)
+      or d.find_elements(*self.ERROR_MESSAGE)
     )
 
   def add_student(self, student: dict[str, Any]) -> None:
