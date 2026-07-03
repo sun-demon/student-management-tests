@@ -1,12 +1,12 @@
 {
   "info": {
     "name": "Student Management API",
-    "description": "Коллекция Postman для тестирования API сервиса управления студентами",
+    "description": "Коллекция Postman для тестирования API EduManage.\n\n**Порядок запуска (Collection Runner):**\n1. Reset State (опционально, только локальный mock)\n2. Register — создаёт нового админа с уникальным логином\n3. Login — сохраняет Bearer-токен в {{token}}\n4. Остальные запросы\n\nПеременная `baseUrl`: http://127.0.0.1:5000 или URL вашего VPS.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {"key": "baseUrl", "value": "http://127.0.0.1:5000"},
-    {"key": "username", "value": "admin_demo"},
+    {"key": "username", "value": ""},
     {"key": "password", "value": "DemoPass123!"},
     {"key": "token", "value": ""},
     {"key": "studentId", "value": "1"}
@@ -14,30 +14,69 @@
   "item": [
     {
       "name": "Auth",
+      "description": "Сначала Register, затем Login. Register каждый раз генерирует новый username.",
       "item": [
         {
-          "name": "Register",
-          "request": {
-            "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}"
-            },
-            "url": "{{baseUrl}}/register"
-          }
-        },
-        {
-          "name": "Login",
+          "name": "00 Reset State (local mock)",
           "event": [
             {
               "listen": "test",
               "script": {
+                "type": "text/javascript",
                 "exec": [
-                  "if (pm.response.code === 200) {",
-                  "  const json = pm.response.json();",
-                  "  pm.collectionVariables.set('token', json.access_token);",
-                  "}"
+                  "pm.test('Reset returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('State cleared message', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.message).to.include('сброшено');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/reset",
+            "description": "Только для локального mock-сервера. Очищает пользователей и студентов."
+          }
+        },
+        {
+          "name": "01 Register",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const uniqueUsername = 'admin_' + Date.now();",
+                  "pm.collectionVariables.set('username', uniqueUsername);",
+                  "pm.collectionVariables.set('password', 'DemoPass123!');",
+                  "pm.collectionVariables.unset('token');",
+                  "console.log('New username:', uniqueUsername);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response contains username', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.username).to.eql(pm.collectionVariables.get('username'));",
+                  "});",
+                  "",
+                  "pm.test('Registration success message', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.message).to.be.a('string');",
+                  "});"
                 ]
               }
             }
@@ -49,32 +88,147 @@
               "mode": "raw",
               "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}"
             },
-            "url": "{{baseUrl}}/login"
+            "url": "{{baseUrl}}/register",
+            "description": "Перед запросом автоматически генерируется уникальный username."
           }
         },
         {
-          "name": "Logout",
+          "name": "02 Login",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const username = pm.collectionVariables.get('username');",
+                  "if (!username) {",
+                  "    throw new Error('Сначала выполните Register — username пустой');",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Access token received', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.access_token).to.be.a('string').and.not.empty;",
+                  "    pm.collectionVariables.set('token', json.access_token);",
+                  "});",
+                  "",
+                  "pm.test('Token type is Bearer', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.token_type).to.eql('Bearer');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": "{{baseUrl}}/login",
+            "description": "Использует username/password из Register. Сохраняет token."
+          }
+        },
+        {
+          "name": "03 Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Logout message received', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.message).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
             "url": "{{baseUrl}}/logout"
+          }
+        },
+        {
+          "name": "Login - Wrong Password (negative)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401 Unauthorized', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"wrong_password\"\n}"
+            },
+            "url": "{{baseUrl}}/login"
           }
         }
       ]
     },
     {
       "name": "Students",
+      "description": "Требуется Bearer-токен. Сначала выполните Auth → Register и Login.",
       "item": [
         {
           "name": "Add Student - Valid",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.collectionVariables.get('token')) {",
+                  "    throw new Error('Нет токена. Выполните Auth → Register, затем Login');",
+                  "}"
+                ]
+              }
+            },
+            {
               "listen": "test",
               "script": {
+                "type": "text/javascript",
                 "exec": [
-                  "if (pm.response.code === 201) {",
-                  "  pm.collectionVariables.set('studentId', pm.response.json().id);",
-                  "}"
+                  "pm.test('Status is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Student has required fields', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.full_name).to.eql('Иванов Иван Иванович');",
+                  "    pm.expect(json.age).to.eql(20);",
+                  "    pm.expect(json.gender).to.eql('М');",
+                  "    pm.expect(json.id).to.be.a('number');",
+                  "    pm.collectionVariables.set('studentId', json.id);",
+                  "});"
                 ]
               }
             }
@@ -94,6 +248,24 @@
         },
         {
           "name": "Add Student - Invalid Age",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400 Bad Request', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Validation errors returned', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.errors).to.be.an('array').that.is.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -109,6 +281,19 @@
         },
         {
           "name": "Add Student - Invalid Gender",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400 Bad Request', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -123,7 +308,50 @@
           }
         },
         {
+          "name": "Add Student - No Token (negative)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401 Unauthorized', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Без Токена\",\n  \"age\": 20,\n  \"gender\": \"М\"\n}"
+            },
+            "url": "{{baseUrl}}/add-user"
+          }
+        },
+        {
           "name": "Get All Students",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is array', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
@@ -132,6 +360,24 @@
         },
         {
           "name": "Get Student By ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Student ID matches', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.id).to.eql(Number(pm.collectionVariables.get('studentId')));",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
@@ -140,6 +386,24 @@
         },
         {
           "name": "Update Student",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Name updated', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.full_name).to.eql('Обновлённый Студент');",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
             "header": [
@@ -155,6 +419,19 @@
         },
         {
           "name": "Update Nonexistent Student",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404 Not Found', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
             "header": [
@@ -170,6 +447,19 @@
         },
         {
           "name": "Delete Student",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
