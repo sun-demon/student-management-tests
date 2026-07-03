@@ -18,6 +18,8 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from src.pages.add_student_page import AddStudentPage
 from src.pages.login_page import LoginPage
+from src.pages.register_page import RegisterPage
+from src.pages.students_list_page import StudentsListPage
 from src.utils.api_client import ApiClient
 from src.utils.config import BASE_URL, HEADLESS
 
@@ -139,6 +141,16 @@ def login_page(driver: webdriver.Chrome, mock_server: str) -> LoginPage:
 @pytest.fixture
 def add_student_page(driver: webdriver.Chrome, mock_server: str) -> AddStudentPage:
   return AddStudentPage(driver, mock_server)
+
+
+@pytest.fixture
+def register_page(driver: webdriver.Chrome, mock_server: str) -> RegisterPage:
+  return RegisterPage(driver, mock_server)
+
+
+@pytest.fixture
+def students_list_page(driver: webdriver.Chrome, mock_server: str) -> StudentsListPage:
+  return StudentsListPage(driver, mock_server)
 
 
 @pytest.fixture

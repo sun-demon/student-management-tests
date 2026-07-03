@@ -68,3 +68,14 @@ class TestAuthAPI:
       response = api_client.login("ghost_user", "password")
     with testit.step("Проверить статус 401 Unauthorized"):
       assert response.status_code == 401
+
+  @testit.externalId("API-AUTH-007")
+  @testit.displayName("Успешный выход из системы")
+  @testit.description("POST /logout с валидным токеном. Ожидается 200.")
+  @testit.tags("API", "Auth", "Logout")
+  def test_logout_success(self, authenticated_api_client):
+    with testit.step("Отправить POST /logout"):
+      response = authenticated_api_client.logout()
+    with testit.step("Проверить статус 200"):
+      assert response.status_code == 200
+      assert "выход" in response.json().get("message", "").lower()

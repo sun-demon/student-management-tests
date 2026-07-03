@@ -101,13 +101,19 @@ def _validate_student_payload(data: dict, partial: bool = False) -> tuple[dict |
     if errors:
         return None, (jsonify({"errors": errors}), 400)
 
-    return {
-        "full_name": str(full_name).strip(),
-        "age": int(age),
-        "gender": gender,
-        "enrollment_date": enrollment_date or None,
-        "is_active": bool(is_active),
-    }, None
+    validated: dict = {}
+    if not partial or "full_name" in data:
+        validated["full_name"] = str(full_name).strip()
+    if not partial or "age" in data:
+        validated["age"] = int(age)
+    if not partial or "gender" in data:
+        validated["gender"] = gender
+    if not partial or "enrollment_date" in data:
+        validated["enrollment_date"] = enrollment_date or None
+    if not partial or "is_active" in data:
+        validated["is_active"] = bool(is_active)
+
+    return validated, None
 
 
 def _create_student(validated: dict) -> dict:
