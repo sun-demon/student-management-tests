@@ -1,10 +1,59 @@
-# Автотесты для сервиса управления студентами
+<p align="center">
+  <img src="docs/icon.svg" alt="EduManage" width="96">
+</p>
 
-Итоговая аттестационная работа по курсу **«Инженер по тестированию: Автоматизация тестирования сервиса с помощью Python»**.
+<h1 align="center">EduManage — автотесты для сервиса управления студентами</h1>
 
-Репозиторий содержит автоматизированные UI- и API-тесты, локальную имитацию тестируемого приложения, интеграцию с TestIt и CI/CD через GitHub Actions.
+<p align="center">
+  Итоговая аттестационная работа по курсу <strong>«Инженер по тестированию: Автоматизация тестирования сервиса с помощью Python»</strong>
+</p>
 
-**Автор:** Демин Даниил Петрович, группа ИУК4-62Б
+<p align="center">
+  <strong>Автор:</strong> Демин Даниил Петрович, группа ИУК4-62Б<br>
+  <a href="https://github.com/sun-demon/student-management-tests">github.com/sun-demon/student-management-tests</a>
+</p>
+
+Репозиторий содержит автоматизированные UI- и API-тесты, локальную имитацию тестируемого приложения (**EduManage**), интеграцию с TestIt и CI/CD через GitHub Actions.
+
+## Быстрый старт
+
+```bash
+git clone https://github.com/sun-demon/student-management-tests.git
+cd student-management-tests
+python -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+
+# Запуск приложения в браузере
+python mock_server/app.py          # → http://127.0.0.1:5000
+
+# Запуск автотестов (mock-сервер поднимется сам)
+pytest tests/
+pytest tests/api/                  # только API, без Chrome
+```
+
+## Скриншоты приложения
+
+Локальный mock-сервер с современным UI: регистрация, авторизация, CRUD студентов, Swagger.
+
+| Главная | Добавление студента |
+|---------|---------------------|
+| ![Главная](docs/screenshots/home.png) | ![Добавление студента](docs/screenshots/add-student.png) |
+
+| Список студентов | Swagger API |
+|------------------|-------------|
+| ![Список студентов](docs/screenshots/students-list.png) | ![Swagger](docs/screenshots/swagger.png) |
+
+<details>
+<summary>Ещё скриншоты (регистрация, вход, успешное добавление)</summary>
+
+| Регистрация | Вход |
+|-------------|------|
+| ![Регистрация](docs/screenshots/register.png) | ![Вход](docs/screenshots/login.png) |
+
+![Успешное добавление студента](docs/screenshots/add-student-success.png)
+
+</details>
 
 ## Описание проекта
 
@@ -19,6 +68,10 @@
 ```
 student-management-tests/
 ├── mock_server/           # Локальная имитация приложения (Flask)
+├── docs/
+│   ├── icon.svg           # Иконка EduManage для README
+│   ├── screenshots/       # Скриншоты UI
+│   └── TESTIT_GUIDE.md    # Инструкция по TestIt
 ├── src/
 │   ├── pages/             # Page Object Model для UI
 │   ├── utils/             # API-клиент и конфигурация
@@ -199,6 +252,16 @@ sudo APP_DIR=/opt/edumanage ./deploy/deploy.sh
 См. `deploy/nginx.conf.example` и Certbot.
 
 Подробнее по TestIT: [docs/TESTIT_GUIDE.md](docs/TESTIT_GUIDE.md)
+
+## Приложения для сдачи
+
+| Файл | Где взять |
+|------|-----------|
+| `Student_Management_API.postman_collection.json` | `postman/` в репозитории |
+| `testit_results.xml` | `reports/results.xml` после `pytest tests/ --junitxml=reports/results.xml` или artifact CI |
+| `test_cases_ui.xlsx` | Экспорт из TestIt **или** скриншоты тест-кейсов |
+| `test_run_results_ui.xlsx` | Экспорт ручного прогона **или** скриншоты прогона (Lite) |
+| Ссылка на GitHub | https://github.com/sun-demon/student-management-tests |
 
 ---
 
