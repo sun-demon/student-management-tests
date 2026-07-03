@@ -14,8 +14,8 @@ class AddStudentPage(BasePage):
   ENROLLMENT_DATE_INPUT = (By.ID, "enrollment_date")
   IS_ACTIVE_CHECKBOX = (By.ID, "is_active")
   SUBMIT_BUTTON = (By.ID, "add-btn")
-  ERROR_MESSAGE = (By.CSS_SELECTOR, ".error")
-  SUCCESS_MESSAGE = (By.CSS_SELECTOR, ".success")
+  ERROR_MESSAGE = (By.CSS_SELECTOR, ".alert-error")
+  SUCCESS_MESSAGE = (By.CSS_SELECTOR, ".alert-success")
   STUDENTS_TABLE = (By.ID, "students-table")
 
   def open_add_student(self) -> None:
