@@ -8,14 +8,14 @@ import testit
 class TestRegisterUI:
   @testit.externalId("UI-AUTH-003")
   @testit.displayName("Успешная регистрация через UI")
-  @testit.description("Регистрация нового администратора через /register. Ожидается редирект на /login.")
+  @testit.description("Регистрация нового администратора через /register. Ожидается автологин и переход на /add-user.")
   @testit.tags("UI", "Auth", "Register")
   def test_register_success(self, register_page):
     username = f"ui_admin_{uuid.uuid4().hex[:8]}"
     with testit.step("Заполнить форму регистрации"):
       register_page.register(username, "SecurePass123!")
-    with testit.step("Проверить переход на страницу входа"):
-      assert register_page.is_on_login_page()
+    with testit.step("Проверить автологин и форму добавления студента"):
+      assert register_page.is_logged_in()
 
 
 @testit.nameSpace("UI")

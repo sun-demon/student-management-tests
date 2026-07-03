@@ -20,7 +20,14 @@ class RegisterPage(BasePage):
     self.driver.find_element(*self.PASSWORD_INPUT).send_keys(password)
     self.wait_for_element_clickable(self.REGISTER_BUTTON).click()
     self.wait.until(
-      lambda d: "/login" in d.current_url or d.find_elements(*self.ERROR_MESSAGE)
+      lambda d: "/add-user" in d.current_url
+      or d.find_elements(By.ID, "logout-btn")
+      or d.find_elements(*self.ERROR_MESSAGE)
+    )
+
+  def is_logged_in(self) -> bool:
+    return "/add-user" in self.driver.current_url or bool(
+      self.driver.find_elements(By.ID, "logout-btn")
     )
 
   def is_on_login_page(self) -> bool:

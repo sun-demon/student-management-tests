@@ -49,6 +49,14 @@ def _current_user() -> str | None:
     return _ui_auth_required()
 
 
+def _redirect_with_ui_session(username: str):
+    token = _generate_token()
+    tokens_db[token] = username
+    response = redirect(url_for("add_user_page"))
+    response.set_cookie("session_token", token, httponly=True, samesite="Lax")
+    return response
+
+
 def _stats() -> dict[str, int]:
     students = list(students_db.values())
     return {
@@ -278,7 +286,7 @@ def register_page():
             409,
         )
     users_db[username] = {"password": password}
-    return redirect(url_for("login_page"))
+    return _redirect_with_ui_session(username)
 
 
 @app.route("/login", methods=["GET", "POST"], endpoint="login_page")
@@ -318,11 +326,7 @@ def login_page():
             401,
         )
 
-    token = _generate_token()
-    tokens_db[token] = username
-    response = redirect(url_for("add_user_page"))
-    response.set_cookie("session_token", token, httponly=True, samesite="Lax")
-    return response
+    return _redirect_with_ui_session(username)
 
 
 @app.post("/logout")
