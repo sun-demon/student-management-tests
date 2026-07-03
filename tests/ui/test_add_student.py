@@ -11,7 +11,7 @@ class TestAddStudentUI:
   @testit.externalId("UI-AUTO-001")
   @testit.displayName("Успешное добавление студента через UI")
   @testit.description("Добавление студента через форму /add-user с проверкой в UI и API.")
-  @testit.labels("UI", "Students")
+  @testit.tags("UI", "Students")
   def test_add_student_success(
     self,
     add_student_page: AddStudentPage,
@@ -44,7 +44,7 @@ class TestAddStudentUI:
   @testit.externalId("UI-AUTO-002")
   @testit.displayName("Добавление студента без ФИО")
   @testit.description("Отправка формы без обязательного поля ФИО. Ожидается ошибка валидации.")
-  @testit.labels("UI", "Students", "Negative")
+  @testit.tags("UI", "Students", "Negative")
   def test_add_student_missing_fullname(
     self,
     add_student_page,
@@ -61,7 +61,7 @@ class TestAddStudentUI:
   @testit.externalId("UI-AUTO-003")
   @testit.displayName("Добавление студента с невалидным возрастом")
   @testit.description("Возраст -5. Ожидается ошибка валидации.")
-  @testit.labels("UI", "Students", "Negative")
+  @testit.tags("UI", "Students", "Negative")
   def test_add_student_invalid_age(
     self,
     add_student_page,
@@ -76,7 +76,7 @@ class TestAddStudentUI:
   @testit.externalId("UI-AUTO-004")
   @testit.displayName("Добавление студента без указания пола")
   @testit.description("Поле «Пол» не заполнено. Ожидается ошибка валидации.")
-  @testit.labels("UI", "Students", "Negative")
+  @testit.tags("UI", "Students", "Negative")
   def test_add_student_missing_gender(
     self,
     add_student_page,
@@ -91,7 +91,7 @@ class TestAddStudentUI:
   @testit.externalId("UI-AUTO-005")
   @testit.displayName("Добавление студента с ФИО со спецсимволами")
   @testit.description("ФИО O'Коннор-Смит А.Б. Ожидается успешное добавление.")
-  @testit.labels("UI", "Students")
+  @testit.tags("UI", "Students")
   def test_add_student_valid_data_special_chars(
     self,
     add_student_page,

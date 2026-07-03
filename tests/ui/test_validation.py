@@ -7,7 +7,7 @@ class TestValidationUI:
   @testit.externalId("UI-VAL-001")
   @testit.displayName("Невалидный формат даты поступления")
   @testit.description("Дата 31/02/2024 в поле enrollment_date. Ожидается ошибка валидации.")
-  @testit.labels("UI", "Students", "Negative")
+  @testit.tags("UI", "Students", "Negative")
   def test_add_student_invalid_date_format(
     self,
     add_student_page,
