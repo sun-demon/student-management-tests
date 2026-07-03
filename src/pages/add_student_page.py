@@ -4,6 +4,8 @@ from typing import Any
 
 from selenium.webdriver.common.by import By
 
+from selenium.webdriver.support import expected_conditions as EC
+
 from src.pages.base_page import BasePage
 
 
@@ -20,6 +22,8 @@ class AddStudentPage(BasePage):
 
   def open_add_student(self) -> None:
     self.open("/add-user")
+    if "/login" in self.driver.current_url:
+      raise AssertionError("Нет UI-авторизации: открылась страница входа вместо /add-user")
     self.wait_for_element_visible(self.FULL_NAME_INPUT)
 
   def fill_form(self, student: dict[str, Any]) -> None:
@@ -38,6 +42,9 @@ class AddStudentPage(BasePage):
 
   def submit(self) -> None:
     self.wait_for_element_clickable(self.SUBMIT_BUTTON).click()
+    self.wait.until(
+      EC.presence_of_element_located((By.CSS_SELECTOR, ".alert-error, .alert-success"))
+    )
 
   def add_student(self, student: dict[str, Any]) -> None:
     self.open_add_student()

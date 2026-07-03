@@ -34,6 +34,7 @@ jobs:
         env:
           BASE_URL: http://127.0.0.1:5000
           HEADLESS: "true"
+          WEBDRIVER_TIMEOUT: "20"
         run: |
           mkdir -p reports
           pytest tests/ \

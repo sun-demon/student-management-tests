@@ -28,6 +28,10 @@ class TestAddStudentUI:
       assert add_student_page.is_student_in_table(student["full_name"])
 
     with testit.step("Проверить наличие студента через API"):
+      authenticated_api_client.ensure_authenticated(
+        ui_authenticated_session["username"],
+        ui_authenticated_session["password"],
+      )
       assert authenticated_api_client.student_exists(
         student["full_name"],
         student["age"],

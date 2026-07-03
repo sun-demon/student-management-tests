@@ -4,6 +4,7 @@ import json
 import subprocess
 import sys
 import time
+import uuid
 from pathlib import Path
 from typing import Generator
 
@@ -12,6 +13,8 @@ import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
 from src.pages.add_student_page import AddStudentPage
@@ -62,9 +65,13 @@ def mock_server() -> Generator[str, None, None]:
 
 @pytest.fixture(autouse=True)
 def reset_app_state(mock_server: str) -> Generator[None, None, None]:
-  requests.post(f"{mock_server}/reset", timeout=5)
+  """Сброс состояния только для локального mock-сервера."""
+  is_local = "127.0.0.1" in mock_server or "localhost" in mock_server
+  if is_local:
+    requests.post(f"{mock_server}/reset", timeout=5)
   yield
-  requests.post(f"{mock_server}/reset", timeout=5)
+  if is_local:
+    requests.post(f"{mock_server}/reset", timeout=5)
 
 
 @pytest.fixture
@@ -74,7 +81,8 @@ def api_client(mock_server: str) -> ApiClient:
 
 @pytest.fixture
 def registered_admin(api_client: ApiClient) -> dict[str, str]:
-  username = "test_admin"
+  """Регистрация администратора через API (как в ТЗ)."""
+  username = f"test_admin_{uuid.uuid4().hex[:8]}"
   password = "SecurePass123!"
   response = api_client.register(username=username, password=password)
   assert response.status_code == 201, response.text
@@ -83,8 +91,8 @@ def registered_admin(api_client: ApiClient) -> dict[str, str]:
 
 @pytest.fixture
 def authenticated_api_client(api_client: ApiClient, registered_admin: dict[str, str]) -> ApiClient:
-  response = api_client.login(registered_admin["username"], registered_admin["password"])
-  assert response.status_code == 200, response.text
+  """API-клиент с Bearer-токеном."""
+  api_client.ensure_authenticated(registered_admin["username"], registered_admin["password"])
   return api_client
 
 
@@ -132,6 +140,10 @@ def ui_authenticated_session(
   login_page: LoginPage,
   registered_admin: dict[str, str],
 ) -> dict[str, str]:
+  """Авторизация в UI после регистрации администратора через API."""
   login_page.login(registered_admin["username"], registered_admin["password"])
+  login_page.wait.until(
+    EC.visibility_of_element_located((By.ID, "logout-btn"))
+  )
   assert login_page.is_logged_in(), "Авторизация в UI не завершилась вовремя"
   return registered_admin

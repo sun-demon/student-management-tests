@@ -76,8 +76,13 @@ class ApiClient:
 
   def student_exists(self, full_name: str, age: int, gender: str) -> bool:
     response = self.get_students()
+    if response.status_code == 401:
+      raise AssertionError(
+        "API вернул 401: нет авторизации. "
+        "Убедитесь, что фикстура authenticated_api_client выполнила login()."
+      )
     if not response.ok:
-      return False
+      raise AssertionError(f"API вернул {response.status_code}: {response.text}")
     for student in response.json():
       if (
         student.get("full_name") == full_name
@@ -86,6 +91,11 @@ class ApiClient:
       ):
         return True
     return False
+
+  def ensure_authenticated(self, username: str, password: str) -> None:
+    if not self.token:
+      response = self.login(username, password)
+      assert response.status_code == 200, response.text
 
   def _auth_headers(self) -> dict[str, str]:
     if not self.token:
