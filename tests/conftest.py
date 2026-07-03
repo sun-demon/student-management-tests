@@ -15,7 +15,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
 
 from src.pages.add_student_page import AddStudentPage
 from src.pages.login_page import LoginPage
@@ -122,8 +121,11 @@ def driver(mock_server: str) -> Generator[webdriver.Chrome, None, None]:
   else:
     pytest.skip("Chrome/Chromium не установлен — UI-тесты пропущены")
 
-  service = Service(ChromeDriverManager().install())
-  browser = webdriver.Chrome(service=service, options=options)
+  chromedriver_path = os.getenv("CHROMEDRIVER_PATH") or os.getenv("CHROMEDRIVER_BIN")
+  if chromedriver_path:
+    browser = webdriver.Chrome(service=Service(chromedriver_path), options=options)
+  else:
+    browser = webdriver.Chrome(options=options)
   browser.implicitly_wait(0)
   yield browser
   browser.quit()
