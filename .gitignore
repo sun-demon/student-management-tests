@@ -13,3 +13,4 @@ connection_config.ini
 chromedriver*
 *.png
 *.xlsx
+build/
