@@ -1,0 +1,65 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  schedule:
+    - cron: "0 6 * * *"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Google Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Run tests
+        env:
+          BASE_URL: http://127.0.0.1:5000
+          HEADLESS: "true"
+        run: |
+          mkdir -p reports
+          pytest tests/ \
+            --junitxml=reports/results.xml \
+            --html=reports/report.html \
+            --self-contained-html
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: reports/
+
+      - name: Upload results to TestIt
+        if: always() && secrets.TMS_TOKEN != ''
+        env:
+          TMS_TOKEN: ${{ secrets.TMS_TOKEN }}
+          TMS_URL: ${{ secrets.TMS_URL }}
+          TMS_PROJECT_ID: ${{ secrets.TMS_PROJECT_ID }}
+          TMS_CONFIGURATION_ID: ${{ secrets.TMS_CONFIGURATION_ID }}
+        run: |
+          pip install testit-cli
+          testit results import \
+            --url "$TMS_URL" \
+            --project-id "$TMS_PROJECT_ID" \
+            --configuration-id "$TMS_CONFIGURATION_ID" \
+            --testrun-name "GitHub Actions - ${{ github.run_number }}" \
+            --results reports

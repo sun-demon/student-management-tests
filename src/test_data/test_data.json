@@ -1,0 +1,36 @@
+{
+  "valid_student": {
+    "full_name": "Иванов Иван Иванович",
+    "age": 20,
+    "gender": "М",
+    "enrollment_date": "2024-09-01",
+    "is_active": true
+  },
+  "student_special_chars": {
+    "full_name": "О'Коннор-Смит А.Б.",
+    "age": 22,
+    "gender": "Ж",
+    "enrollment_date": "",
+    "is_active": false
+  },
+  "invalid_age_student": {
+    "full_name": "Петров Пётр",
+    "age": -5,
+    "gender": "М"
+  },
+  "missing_gender_student": {
+    "full_name": "Сидоров Сидор",
+    "age": 19
+  },
+  "invalid_gender_student": {
+    "full_name": "Тестов Тест",
+    "age": 21,
+    "gender": "X"
+  },
+  "invalid_date_student": {
+    "full_name": "Датов Дата",
+    "age": 18,
+    "gender": "Ж",
+    "enrollment_date": "invalid-date"
+  }
+}

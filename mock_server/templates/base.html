@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}EduManage{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  {% if auth_layout %}
+  <div class="auth-layout">
+    <div class="auth-panel">
+      <div class="auth-brand">
+        <div class="brand-icon" style="margin: 0 auto 12px;">EM</div>
+        <h2 style="margin: 0;">EduManage</h2>
+        <p style="color: var(--text-muted); margin-top: 6px;">Система учёта студентов</p>
+      </div>
+      <div class="card">
+        {% block auth_content %}{% endblock %}
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">EM</div>
+        <div>
+          <h1>EduManage</h1>
+          <p>Student Portal</p>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="{{ url_for('index') }}" class="{% if active_page == 'home' %}active{% endif %}">Главная</a>
+        {% if current_user %}
+        <a href="{{ url_for('add_user_page') }}" class="{% if active_page == 'add' %}active{% endif %}">Добавить студента</a>
+        <a href="{{ url_for('users_page') }}" class="{% if active_page == 'students' %}active{% endif %}">Список студентов</a>
+        {% else %}
+        <a href="{{ url_for('login_page') }}" class="{% if active_page == 'login' %}active{% endif %}">Вход</a>
+        <a href="{{ url_for('register_page') }}" class="{% if active_page == 'register' %}active{% endif %}">Регистрация</a>
+        {% endif %}
+        <a href="{{ url_for('swagger_page') }}" class="{% if active_page == 'swagger' %}active{% endif %}">API / Swagger</a>
+      </nav>
+    </aside>
+    <main class="main">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+  {% endif %}
+
+  <div class="toast-container"></div>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

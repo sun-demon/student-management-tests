@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% set auth_layout = true %}
+{% block title %}Регистрация — EduManage{% endblock %}
+{% block auth_content %}
+<h2 style="margin: 0 0 8px;">Регистрация администратора</h2>
+<p style="color: var(--text-muted); margin: 0 0 20px;">Создайте учётную запись для доступа к системе</p>
+
+{% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+
+<form method="post" id="register-form" class="form-grid">
+  <div class="form-group">
+    <label for="username">Имя пользователя</label>
+    <input name="username" id="username" required autocomplete="username" placeholder="admin">
+  </div>
+  <div class="form-group">
+    <label for="password">Пароль</label>
+    <input name="password" id="password" type="password" required autocomplete="new-password" placeholder="Минимум 6 символов" minlength="6">
+  </div>
+  <button type="submit" class="btn btn-primary" id="register-btn">Зарегистрироваться</button>
+</form>
+<p style="margin-top: 20px; color: var(--text-muted); font-size: 14px;">
+  Уже есть аккаунт? <a href="{{ url_for('login_page') }}">Войти</a>
+</p>
+{% endblock %}

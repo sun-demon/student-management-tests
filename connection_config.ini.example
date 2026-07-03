@@ -1,0 +1,12 @@
+# Скопируйте в connection_config.ini и заполните своими данными TestIt.
+# Документация: https://docs.testit.software/user-guide/integrations/automation/pytest.html
+
+[testit]
+url = https://your-instance.testit.software
+privateToken = YOUR_PRIVATE_TOKEN
+projectId = YOUR_PROJECT_ID
+configurationId = YOUR_CONFIGURATION_ID
+adapterMode = 2
+testRunName = Student Management Autotests
+certValidation = false
+automaticCreationTestCases = true

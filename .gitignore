@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+env/
+reports/
+*.log
+connection_config.ini
+.env
+.idea/
+.vscode/
+chromedriver*
+*.png
+*.xlsx

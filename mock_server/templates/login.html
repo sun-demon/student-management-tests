@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% set auth_layout = true %}
+{% block title %}Вход — EduManage{% endblock %}
+{% block auth_content %}
+<h2 style="margin: 0 0 8px;">Вход в систему</h2>
+<p style="color: var(--text-muted); margin: 0 0 20px;">Введите учётные данные администратора</p>
+
+{% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+
+<form method="post" id="login-form" class="form-grid">
+  <div class="form-group">
+    <label for="username">Имя пользователя</label>
+    <input name="username" id="username" required autocomplete="username" placeholder="admin">
+  </div>
+  <div class="form-group">
+    <label for="password">Пароль</label>
+    <input name="password" id="password" type="password" required autocomplete="current-password" placeholder="••••••••">
+  </div>
+  <button type="submit" class="btn btn-primary" id="login-btn">Войти</button>
+</form>
+<p style="margin-top: 20px; color: var(--text-muted); font-size: 14px;">
+  Нет аккаунта? <a href="{{ url_for('register_page') }}">Зарегистрироваться</a>
+</p>
+{% endblock %}

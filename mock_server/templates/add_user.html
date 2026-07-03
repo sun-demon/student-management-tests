@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Добавить студента — EduManage{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h2>Добавление студента</h2>
+    <p>Заполните форму. Поля со звёздочкой обязательны.</p>
+  </div>
+  <div class="user-badge">
+    <span>{{ current_user }}</span>
+    <a href="{{ url_for('logout_ui') }}" class="btn btn-secondary" id="logout-btn">Выйти</a>
+  </div>
+</div>
+
+<div class="card" style="max-width: 640px;">
+  {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+  {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+  <form method="post" id="add-student-form" class="form-grid">
+    <div class="form-group">
+      <label for="full_name">ФИО *</label>
+      <input name="full_name" id="full_name" placeholder="Иванов Иван Иванович" value="{{ form_data.full_name if form_data else '' }}">
+    </div>
+    <div class="form-group">
+      <label for="age">Возраст *</label>
+      <input name="age" id="age" type="number" min="0" max="120" placeholder="20" value="{{ form_data.age if form_data else '' }}">
+      <div class="hint">Только целое неотрицательное число</div>
+    </div>
+    <div class="form-group">
+      <label for="gender">Пол *</label>
+      <select name="gender" id="gender">
+        <option value="">— выберите —</option>
+        <option value="М" {% if form_data and form_data.gender == 'М' %}selected{% endif %}>М</option>
+        <option value="Ж" {% if form_data and form_data.gender == 'Ж' %}selected{% endif %}>Ж</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="enrollment_date">Дата поступления</label>
+      <input name="enrollment_date" id="enrollment_date" type="date" value="{{ form_data.enrollment_date if form_data else '' }}">
+      <div class="hint">Необязательное поле, формат YYYY-MM-DD</div>
+    </div>
+    <div class="form-group checkbox-row">
+      <input name="is_active" id="is_active" type="checkbox" {% if form_data and form_data.is_active %}checked{% endif %}>
+      <label for="is_active" style="margin: 0;">Студент является действующим</label>
+    </div>
+    <button type="submit" class="btn btn-primary" id="add-btn">
+      <span class="spinner"></span>
+      Добавить
+    </button>
+  </form>
+</div>
+{% endblock %}
