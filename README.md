@@ -142,11 +142,11 @@ testit results import \
 
 Импортируйте коллекцию `postman/Student_Management_API.postman_collection.json`.
 
-**Порядок запуска (Collection Runner):**
-1. `00 Reset State` — опционально, только для локального mock
-2. `01 Register` — автоматически создаёт **новый** `username` (без 409 при повторном запуске)
-3. `02 Login` — сохраняет `token` в переменные коллекции
-4. Запросы из папки Students
+**Порядок папок в Collection Runner:**
+1. `01 Setup` — Reset, Register, Login
+2. `02 Students` — CRUD
+3. `03 Negative` — негативные тесты
+4. `04 Cleanup` — Logout **только в конце** (иначе token сбросится и Students дадут 401)
 
 У каждого запроса есть вкладка **Tests** — при прогоне отображаются результаты проверок (не «no tests found»).
 
