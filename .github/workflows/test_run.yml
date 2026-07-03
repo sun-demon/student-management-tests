@@ -49,13 +49,18 @@ jobs:
           path: reports/
 
       - name: Upload results to TestIt
-        if: always() && secrets.TMS_TOKEN != ''
+        if: always()
+        continue-on-error: true
         env:
           TMS_TOKEN: ${{ secrets.TMS_TOKEN }}
           TMS_URL: ${{ secrets.TMS_URL }}
           TMS_PROJECT_ID: ${{ secrets.TMS_PROJECT_ID }}
           TMS_CONFIGURATION_ID: ${{ secrets.TMS_CONFIGURATION_ID }}
         run: |
+          if [ -z "$TMS_TOKEN" ]; then
+            echo "TMS_TOKEN not set, skipping TestIt upload"
+            exit 0
+          fi
           pip install testit-cli
           testit results import \
             --url "$TMS_URL" \
