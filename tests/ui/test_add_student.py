@@ -5,10 +5,13 @@ import testit
 from src.pages.add_student_page import AddStudentPage
 
 
+@testit.nameSpace("UI")
+@testit.className("AddStudent")
 class TestAddStudentUI:
   @testit.externalId("UI-AUTO-001")
   @testit.displayName("Успешное добавление студента через UI")
-  @testit.workItemIds("TC-UI-001")
+  @testit.description("Добавление студента через форму /add-user с проверкой в UI и API.")
+  @testit.labels("UI", "Students")
   def test_add_student_success(
     self,
     add_student_page: AddStudentPage,
@@ -40,7 +43,8 @@ class TestAddStudentUI:
 
   @testit.externalId("UI-AUTO-002")
   @testit.displayName("Добавление студента без ФИО")
-  @testit.workItemIds("TC-UI-002")
+  @testit.description("Отправка формы без обязательного поля ФИО. Ожидается ошибка валидации.")
+  @testit.labels("UI", "Students", "Negative")
   def test_add_student_missing_fullname(
     self,
     add_student_page,
@@ -56,7 +60,8 @@ class TestAddStudentUI:
 
   @testit.externalId("UI-AUTO-003")
   @testit.displayName("Добавление студента с невалидным возрастом")
-  @testit.workItemIds("TC-UI-003")
+  @testit.description("Возраст -5. Ожидается ошибка валидации.")
+  @testit.labels("UI", "Students", "Negative")
   def test_add_student_invalid_age(
     self,
     add_student_page,
@@ -70,7 +75,8 @@ class TestAddStudentUI:
 
   @testit.externalId("UI-AUTO-004")
   @testit.displayName("Добавление студента без указания пола")
-  @testit.workItemIds("TC-UI-004")
+  @testit.description("Поле «Пол» не заполнено. Ожидается ошибка валидации.")
+  @testit.labels("UI", "Students", "Negative")
   def test_add_student_missing_gender(
     self,
     add_student_page,
@@ -84,7 +90,8 @@ class TestAddStudentUI:
 
   @testit.externalId("UI-AUTO-005")
   @testit.displayName("Добавление студента с ФИО со спецсимволами")
-  @testit.workItemIds("TC-UI-006")
+  @testit.description("ФИО O'Коннор-Смит А.Б. Ожидается успешное добавление.")
+  @testit.labels("UI", "Students")
   def test_add_student_valid_data_special_chars(
     self,
     add_student_page,

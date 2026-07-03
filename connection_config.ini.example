@@ -10,3 +10,4 @@ adapterMode = 2
 testRunName = Student Management Autotests
 certValidation = false
 automaticCreationTestCases = true
+importRealtime = false
