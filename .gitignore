@@ -12,5 +12,6 @@ connection_config.ini
 .vscode/
 chromedriver*
 *.png
+!docs/screenshots/*.png
 *.xlsx
 build/
